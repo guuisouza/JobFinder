@@ -16,8 +16,11 @@ app.use(bodyParser.urlencoded({ extended: false }))
 
 // handlebars
 app.set('views', path.join(__dirname, 'views')) // diretorio das views
-app.engine('handlebars', exphbs({defaultLayout: 'main'})) // arquivo principal de layout da aplicação
+app.engine('handlebars', exphbs.engine({defaultLayout: 'main'})) // arquivo principal de layout da aplicação
 app.set('view engine', 'handlebars') // qual a view engine (framework p renderizar views)
+
+// static folder (css)
+app.use(express.static(path.join(__dirname, 'public'))) // pasta de arquivos estáticos
 
 // db connection
 db
@@ -31,7 +34,7 @@ db
 
 // routes
 app.get('/', (req, res) => {
-    res.send("Funcionando 3")
+    res.render('index') // renderiza o index (arquivo handlebars)
 })
 
 // jobs routes
