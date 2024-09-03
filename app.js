@@ -5,6 +5,8 @@ const app = express()
 const db = require('./db/connection')
 const bodyParser = require('body-parser')
 const Job = require('./models/Job')
+const Sequelize = require('sequelize')
+const Op = Sequelize.Op
 
 const PORT = 3000
 
@@ -36,14 +38,32 @@ db
 // routes
 app.get('/', (req, res) => {
 
-    Job.findAll({order:[
-        ['createdAt', 'DESC']
-    ]})
-    .then(jobs => {
-        res.render('index', { // renderiza a view com os jobs dentro dela
-            jobs
+    let search = req.query.job
+    let query = '%'+search+'%'
+
+    // SE não tiver busca, execute a lógica da home
+    if (!search) {
+        Job.findAll({order:[
+            ['createdAt', 'DESC']
+        ]})
+        .then(jobs => {
+            res.render('index', { // renderiza a view com os jobs dentro dela
+                jobs
+            })
         })
-    })
+        .catch(err => console.log(err))
+    } else {
+        Job.findAll({
+            where: {title: { [Op.like]: query}},
+            order:[['createdAt', 'DESC']]
+        })
+        .then(jobs => {
+            res.render('index', { // renderiza a view com os jobs dentro dela
+                jobs, search
+            })
+        })
+        .catch(err => console.log(err))
+    }
 })
 
 // jobs routes
